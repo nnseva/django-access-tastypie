@@ -34,5 +34,6 @@ class AccessModelResourceMixin(object):
             new_bundle.obj.save()
         return new_bundle
 
-class AccessModelResource(AccessModelResourceMixin,ModelResource):
+
+class AccessModelResource(AccessModelResourceMixin, ModelResource):
     pass

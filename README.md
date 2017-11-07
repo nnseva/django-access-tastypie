@@ -2,7 +2,7 @@
 
 # Django-Access-Tastypie
 
-The Django-Access-Tastypie package introduces an authorization backend for the [Django-Tastypie](https://django-tastypie.readthedocs.io/en/latest/) package to use access rules defined by the [Django-Access](https://github.com/nnseva/django-access) package.
+The Django-Access-Tastypie package provides an authorization backend for the [Django-Tastypie](https://django-tastypie.readthedocs.io/en/latest/) package to use access rules defined by the [Django-Access](https://github.com/nnseva/django-access) package.
 
 ## Installation
 

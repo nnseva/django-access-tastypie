@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.test import TestCase as _TestCase
 from django.test import Client
 
@@ -82,96 +84,78 @@ class FirstTest(TestBase):
     def test_1_login(self):
         c = Client()
         c.login(username='test',password='test')
-        response = c.get('/admin/')
+        response = c.get('/api/v1/')
         self.assertEqual(response.status_code,200)
     def test_2_login(self):
         c = Client()
         c.login(username='another',password='test')
-        response = c.get('/admin/')
+        response = c.get('/api/v1/')
         self.assertEqual(response.status_code,200)
 
 class DjangoAccessTest(TestBase):
     def test_1_check_forbidden_django_permissions(self):
         c = Client()
         c.login(username='another',password='test')
-        response = c.get('/admin/auth/')
+        response = c.get('/api/v1/user/')
         self.assertNotEqual(response.status_code,200)
-        response = c.get('/admin/auth/user/')
-        self.assertNotEqual(response.status_code,200)
-        response = c.get('/admin/auth/group/')
+        response = c.get('/api/v1/group/')
         self.assertNotEqual(response.status_code,200)
 
     def test_2_check_allowed_django_user_permissions(self):
         c = Client()
         c.login(username='test',password='test')
-        response = c.get('/admin/auth/')
+        response = c.get('/api/v1/user/')
         self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/user/')
-        self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/group/')
+        response = c.get('/api/v1/group/')
         self.assertEqual(response.status_code,200)
 
     def test_3_check_allowed_django_group_permissions(self):
         c = Client()
         c.login(username='third',password='test')
-        response = c.get('/admin/auth/')
+        response = c.get('/api/v1/user/')
         self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/user/')
-        self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/group/')
+        response = c.get('/api/v1/group/')
         self.assertEqual(response.status_code,200)
 
 class InstanceAccessTest(TestBase):
     def test_1_check_forbidden_instance_permissions(self):
         c = Client()
         c.login(username='test',password='test')
-        response = c.get('/admin/auth/group/')
+        response = c.get('/api/v1/group/')
         self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/group/%s/change/' % self.group.id)
-        self.assertNotEqual(response.status_code,200)
+        response = c.patch('/api/v1/group/%s/' % self.group.id,
+            content_type='application/json',
+            data=json.dumps(dict(
+                name='Test'
+            ))
+        )
+        self.assertNotEqual(response.status_code,202)
 
     def test_2_check_allowed_instance_permissions(self):
         c = Client()
         c.login(username='third',password='test')
-        response = c.get('/admin/auth/group/')
+        response = c.get('/api/v1/group/')
         self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/group/%s/change/' % self.group.id)
-        self.assertEqual(response.status_code,200)
+        response = c.patch('/api/v1/group/%s/' % self.group.id,
+            content_type='application/json',
+            data=json.dumps(dict(
+                name='Test'
+            ))
+        )
+        self.assertEqual(response.status_code,202)
 
-    def test_3_check_changeable_instance_permissions(self):
+    def test_3_check_allowed_instance_creation(self):
         c = Client()
-        c.login(username='test',password='test')
-        response = c.get('/admin/auth/user/')
+        c.login(username='third',password='test')
+        response = c.get('/api/v1/group/')
         self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/user/%s/change/' % self.user.id)
+        response = c.post('/api/v1/group/',
+            content_type='application/json',
+            data=json.dumps(dict(
+                name='Test-additional'
+            ))
+        )
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code,201)
+        response = c.get('/api/v1/group/%s/' % data['id'])
         self.assertEqual(response.status_code,200)
-        response = c.post('/admin/auth/user/%s/change/' % self.user.id, data={'username':'test2'})
-        self.assertEqual(response.status_code,200)
-        response = c.post('/admin/auth/user/%s/change/' % self.user.id, data={'username':'test'})
-        self.assertEqual(response.status_code,200)
-
-    def test_4_check_readonly_instance_permissions(self):
-        c = Client()
-        c.login(username='test',password='test')
-        response = c.get('/admin/auth/user/')
-        self.assertEqual(response.status_code,200)
-        response = c.get('/admin/auth/user/%s/change/' % self.another.id)
-        self.assertEqual(response.status_code,200)
-        response = c.post('/admin/auth/user/%s/change/' % self.another.id, data={'username':'test2'})
-        self.assertNotEqual(response.status_code,200)
-
-    def test_5_check_restricted_filters(self):
-        c = Client()
-        c.login(username='fourth',password='test')
-        response = c.get('/admin/auth/user/')
-        self.assertEqual(response.status_code,200)
-        self.assertRegex(text_type(response.content),r'href="\?groups__id__exact=%s"[^>]*>%s' % (self.other_group.pk,self.other_group.name))
-        self.assertNotRegex(text_type(response.content),r'href="\?groups__id__exact=%s"[^>]*>%s' % (self.group.pk,self.group.name))
-
-    def test_6_check_restricted_selects(self):
-        c = Client()
-        c.login(username='fourth',password='test')
-        response = c.get('/admin/auth/user/%s/change/' % self.fourth.pk)
-        self.assertEqual(response.status_code,200)
-        self.assertRegex(text_type(response.content),r'<option\ value="%s"\ selected[^>]*>%s' % (self.other_group.pk,self.other_group.name))
-        self.assertNotRegex(text_type(response.content),r'<option\ value="%s"\ selected[^>]*>%s' % (self.group.pk,self.group.name))

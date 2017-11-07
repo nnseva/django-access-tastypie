@@ -91,6 +91,7 @@ setup(
     install_requires=[
         'django>=1.10,<1.12',
         'django-tastypie',
+        'django-access',
     ],
 
     # List additional groups of dependencies here (e.g. development

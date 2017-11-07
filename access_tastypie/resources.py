@@ -10,13 +10,13 @@ import collections
 from access.managers import AccessManager
 
 
-class AccessModelResource(ModelResource):
+class AccessModelResourceMixin(object):
     def obj_create(self, bundle, **kwargs):
         manager = AccessManager(bundle.obj.__class__)
         data = manager.check_appendable(bundle.obj.__class__, bundle.request)
         if data is False:
             raise Unauthorized("Is not appendable")
-        new_bundle = super(AccessModelResource, self).obj_create(bundle, **kwargs)
+        new_bundle = super(AccessModelResourceMixin, self).obj_create(bundle, **kwargs)
         if data:
             for k in data:
                 v = data[k]
@@ -33,3 +33,6 @@ class AccessModelResource(ModelResource):
                     setattr(bundle.obj, k, v)
             new_bundle.obj.save()
         return new_bundle
+
+class AccessModelResource(AccessModelResourceMixin,ModelResource):
+    pass

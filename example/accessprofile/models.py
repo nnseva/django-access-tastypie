@@ -17,10 +17,10 @@ AccessManager.register_plugins({
         )),
     User:CompoundPlugin(
         DjangoAccessPlugin(),
-        ApplyAblePlugin(
+         ApplyAblePlugin(
             changeable=lambda queryset, request: queryset.filter(Q(id=request.user.id)),
             deleteable=lambda queryset, request: queryset.filter(Q(id=request.user.id)),
-        )
+        ),
     ),
     Group:CompoundPlugin(
         DjangoAccessPlugin(),

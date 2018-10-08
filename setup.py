@@ -60,6 +60,8 @@ setup(
         'Framework :: Django',
         'Framework :: Django :: 1.10',
         'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
+        'Framework :: Django :: 2.1',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
@@ -69,9 +71,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        #'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
-        #'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     # What does your project relate to?
@@ -90,7 +92,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'django>=1.10,<1.12',
+        'django>=1.10',
         'django-tastypie',
         'django-access',
     ],

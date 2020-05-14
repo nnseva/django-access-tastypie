@@ -1,9 +1,10 @@
 from tastypie.resources import ModelResource
-from tastypie.exceptions import Unauthorized
+from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.http import HttpUnauthorized
 
 from django.db.models.fields.related import ForeignObjectRel
 
-from django.utils.six import string_types
+from six import string_types
 
 import collections
 
@@ -15,7 +16,7 @@ class AccessModelResourceMixin(object):
         manager = AccessManager(bundle.obj.__class__)
         data = manager.check_appendable(bundle.obj.__class__, bundle.request)
         if data is False:
-            raise Unauthorized("Is not appendable")
+            raise ImmediateHttpResponse(response=HttpUnauthorized())
         new_bundle = super(AccessModelResourceMixin, self).obj_create(bundle, **kwargs)
         if data:
             for k in data:

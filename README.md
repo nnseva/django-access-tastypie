@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/nnseva/django-access-tastypie.svg?branch=master)](https://travis-ci.org/nnseva/django-access-tastypie)
+[![Tests](https://github.com/nnseva/django-access-tastypie/actions/workflows/test.yml/badge.svg)](https://github.com/nnseva/django-access-tastypie/actions/workflows/test.yml)
 
 # Django-Access-Tastypie
 

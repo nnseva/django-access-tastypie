@@ -6,7 +6,10 @@ from django.db.models.fields.related import ForeignObjectRel
 
 from six import string_types
 
-import collections
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 from access.managers import AccessManager
 
@@ -26,7 +29,7 @@ class AccessModelResourceMixin(object):
                     fieldname = fieldname[:-4]
                 field = bundle.obj._meta.get_field(fieldname)
                 if isinstance(field, ForeignObjectRel):
-                    if isinstance(v, collections.Iterable) and not isinstance(v, string_types):
+                    if isinstance(v, Iterable) and not isinstance(v, string_types):
                         fld = getattr(bundle.obj, k)
                         for i in v:
                             fld.add(i)

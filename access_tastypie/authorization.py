@@ -25,7 +25,9 @@ class AccessAuthorization(Authorization):
         if self.check_able('visible', object_list.model, bundle.request) is False:
             return False
         if bundle.obj and bundle.obj.pk:
-            return bool(self.apply_able('visible', object_list.filter(pk=bundle.obj.pk), bundle.request))
+            # Read_detail() will always receive a queryset with a single object, no need
+            # to filter it once again. This preserves any cache inside object_list.
+            return bool(self.apply_able('visible', object_list, bundle.request))
         return True
 
     def update_list(self, object_list, bundle):
